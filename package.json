@@ -4,8 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "start": "http-server -c -1",
+    "empezar": "http-server",
     "cypress-run": "cypress run",
+    "cypress-dev": "cypress open",
     "test": "run-p start cypress-run",
     "test-dev": "run-p start cypress-dev"
   },

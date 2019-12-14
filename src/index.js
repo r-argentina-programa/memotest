@@ -12,6 +12,13 @@ function configurarJuego() {
 }
 
 function manejarEventos($tablero) {
+
+  // $cuadros.forEach(function($cuadro){
+  //   $cuadro.onclick = function(){
+  //     manejarClickCuadro($cuadro);
+  //   }
+  // });
+
   $tablero.onclick = function(e) {
     const $elemento = e.target;
     if ($elemento.classList.contains('cuadro')) {
@@ -55,16 +62,16 @@ function manejarClickCuadro($cuadroActual) {
 }
 
 function cuadrosSonIguales($cuadro1, $cuadro2) {
-
   return $cuadro1.className === $cuadro2.className;
 
   /*
-  Este patrón siempre se puede simplificar:
+  //Este patrón siempre se puede simplificar:
   if($cuadro1.className === $cuadro2.className){
     return true;
   }else{
     return false;
-  }*/
+  }
+  */
 }
 
 function mostrarCuadro($cuadro) {
