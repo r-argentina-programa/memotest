@@ -1,0 +1,33 @@
+nav {
+    font-family: monospace;
+}
+
+.cuadro {
+    background-color: blue;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
+    height: 20vh;
+}
+
+.oculto {
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.en-juego {
+    opacity: 100;
+    transition: opacity 0.4s;
+}
+
+.img-fluid {
+    height: 100%;
+    width: 100%;
+}
+
+.cuadro-resuelto {
+    height: 100%;
+    width: 100%;
+    opacity: 100;
+    transition: opacity, 0.4s;
+}

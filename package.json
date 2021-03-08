@@ -1,22 +1,22 @@
 {
   "name": "memotest",
   "version": "1.0.0",
-  "description": "",
-  "private": true,
+  "description": "Juego memotest realizado como tarea de la clase 10 del curso r/argentina-programa",
+  "main": "index.html",
   "scripts": {
-    "empezar": "http-server",
-    "cypress-run": "cypress run",
-    "cypress-dev": "cypress open",
-    "test": "run-p start cypress-run",
-    "test-dev": "run-p start cypress-dev"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitipe/memotest.git"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "bootstrap": "^4.4.1"
+  "bugs": {
+    "url": "https://github.com/vitipe/memotest/issues"
   },
-  "devDependencies": {
-    "cypress": "^3.8.0",
-    "npm-run-all": "^4.1.5"
+  "homepage": "https://github.com/vitipe/memotest#readme",
+  "dependencies": {
+    "bootstrap": "^4.6.0"
   }
 }

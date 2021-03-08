@@ -1,104 +1,226 @@
-let turnos = 0;
-let $primerCuadro = null;
-const $tablero = document.querySelector('#tablero');
-const $cuadros = $tablero.querySelectorAll('.cuadro');
-const $mensajeFinJuego = document.querySelector('#fin-juego');
+let verduraJugada = [];
+let $cuadrosEnJuego = [];
+let CONTADOR_INTENTOS = 0;
+let SEGUNDOS = 0;
+let MINUTOS = 0;
+const VERDURAS = ["images/tomate.jpg", "images/zapallo.jpg", "images/frutilla.jpg", "images/higo.jpg", "images/albahaca.jpg", 
+                "images/morron.jpg", "images/berenjena.jpg", "images/lechuga.jpg"]
 
-function configurarJuego() {
-  const coloresBase = ['rojo', 'azul', 'verde', 'amarillo', 'negro', 'blanco'];
-  const coloresRepetidos = coloresBase.concat(coloresBase);
-  configurarCuadros($cuadros, coloresRepetidos);
-  manejarEventos($tablero);
+function duplicaVerduras() {
+    let verdurasDuplicadas = VERDURAS.concat(VERDURAS);
+    
+    return verdurasDuplicadas;
 }
 
-function manejarEventos($tablero) {
+function resetearTablero() {
+    resetearJugada();
+    borrarVerduras();
+    resetearReloj();
+    resetearIntentos();
+    resetearNav();
+    habilitarBotonJugar();
+}
 
-  // $cuadros.forEach(function($cuadro){
-  //   $cuadro.onclick = function(){
-  //     manejarClickCuadro($cuadro);
-  //   }
-  // });
+function resetearNav() {
+    document.querySelector("nav").className = "navbar navbar-light bg-light";
+    document.querySelector("nav").style.backgroundColor = '';
+    document.querySelector('#titulo').textContent = "MEMOTEST";
+}
 
-  $tablero.onclick = function(e) {
-    const $elemento = e.target;
-    if ($elemento.classList.contains('cuadro')) {
-      manejarClickCuadro($elemento);
+function deshabilitarBotonJugar() {
+    document.querySelector('#boton-jugar').disabled = true;
+}
+
+function habilitarBotonJugar() {
+    document.querySelector('#boton-jugar').disabled = false;
+}
+
+function resetearReloj() {
+    clearInterval(contadorTiempo);
+    SEGUNDOS = 0;
+    MINUTOS = 0;
+    document.querySelector('#tiempo-juego').textContent = 'Tiempo: 00:00'
+}
+
+function resetearIntentos() {
+    CONTADOR_INTENTOS = 0;
+    document.querySelector('#cantidad-intentos').textContent = `Cantidad de intentos: ${CONTADOR_INTENTOS}`;
+}
+
+function borrarVerduras() {
+    const $cuadros = document.querySelectorAll('.cuadro');
+    const $verduras = document.querySelectorAll('img');
+
+    if ($verduras) {
+        $cuadros.forEach(function($cuadro) {
+            $cuadro.removeChild($cuadro.firstChild)
+        })
     }
-  };
 }
 
-function configurarCuadros($cuadros, colores) {
-  const coloresRandom = colores.sort(function() {
-    return 0.5 - Math.random();
-  });
-
-  coloresRandom.forEach(function(color, i) {
-    $cuadros[i].classList.add(color);
-  });
+function actualizarIntentos() {
+    document.querySelector('#cantidad-intentos').textContent = `Cantidad de intentos: ${CONTADOR_INTENTOS}`;
 }
 
-function manejarClickCuadro($cuadroActual) {
-  mostrarCuadro($cuadroActual);
+function bloquearTablero() {
+    document.querySelectorAll('.cuadro').forEach(function($cuadro) {
+        $cuadro.onclick = function() {}
+    });
+};
 
-  if ($primerCuadro === null) {
-    $primerCuadro = $cuadroActual;
-  } else {
+function bloquearCuadroJugado() {
+    document.querySelectorAll('.en-juego').forEach(function($cuadro) {
+        $cuadro.onclick = function() {
+        };
+    });
+};
 
-    if ($primerCuadro === $cuadroActual) {
-      return;
+function desbloquearTablero() {
+    document.querySelectorAll('.img-fluid').forEach(function($cuadro) {
+        $cuadro.onclick = manejarInputUsuario;
+    });
+};
+
+function mostrarImagenCuadro($imagenClickeada) {
+    $imagenClickeada.className = "img-fluid en-juego";
+}
+
+function ocultarImagenCuadro() {
+    $cuadrosEnJuego.forEach(function($imagenClickeada) {
+        $imagenClickeada.className = "img-fluid oculto";
+
+    })
+}
+
+function ocultarCuadrosResueltos() {
+    $cuadrosEnJuego.forEach(function(cuadroClickeado) {
+        cuadroClickeado.src = "images/acierto.jpg";
+        cuadroClickeado.className = "cuadro-resuelto";
+    })
+    document.querySelectorAll('.cuadro-resuelto').forEach(function($cuadro) {
+        $cuadro.onclick = function() {
+
+        }
+    })
+}
+
+function manejarInputUsuario(e) {
+    $imagenClickeada = e.target;
+    reproducirSonidoClick();
+    if (verduraJugada.length < 2) {
+        mostrarImagenCuadro($imagenClickeada);
+        verduraJugada.push($imagenClickeada.src);
+        $cuadrosEnJuego.push($imagenClickeada);
+        manejarJugada();
+    }
+}
+
+function reproducirSonidoClick() {
+    const $sonido = document.querySelector('#sonido-click');
+    $sonido.play();
+}
+
+function obtenerVerduraAleatoria($verduras) {
+    let numeroRandom = Math.floor(Math.random() * $verduras.length)
+    let verduraAleatoria = $verduras.splice(numeroRandom, 1)
+
+    return verduraAleatoria
+}
+
+function generarTableroRandom() {
+    let verdurasJuego = duplicaVerduras();
+    const $cuadrosTablero = document.querySelectorAll('.cuadro');
+    $cuadrosTablero.forEach(function($cuadro) {
+        let imgVerdura = document.createElement('img');
+        imgVerdura.src = obtenerVerduraAleatoria(verdurasJuego);
+        imgVerdura.className = 'img-fluid oculto';
+        imgVerdura.draggable = false;
+        $cuadro.appendChild(imgVerdura);
+    });
+}
+
+function iniciarTiempoJuego() {
+    const $tiempoJuego = document.querySelector('#tiempo-juego');
+
+    function sumarTiempo() {
+        if (document.querySelectorAll('.cuadro-resuelto').length < 16) {
+            SEGUNDOS++;
+
+            if (SEGUNDOS === 60) {
+                SEGUNDOS = 0;
+                MINUTOS++;
+            }
+
+            if (SEGUNDOS.toString().length === 1) {
+                SEGUNDOS = `0${SEGUNDOS}`
+            }
+
+            if (MINUTOS.toString().length === 1) {
+                MINUTOS = `0${MINUTOS}`
+            }
+
+            $tiempoJuego.textContent = `Tiempo: ${MINUTOS}:${SEGUNDOS}`
+        }
+    }
+    contadorTiempo = setInterval(sumarTiempo, 1000);
+
+    return contadorTiempo; 
+}
+
+function mostrarVictoria() {
+    document.querySelector("nav").className = "navbar navbar-light";
+    document.querySelector("nav").style.backgroundColor = "#bd00ce"
+    document.querySelector('#titulo').textContent = "GANASTE! :D"
+}
+
+function resetearJugada() {
+    verduraJugada = [];
+    $cuadrosEnJuego = [];
+    desbloquearTablero();
+}
+
+function aciertoJugada() {
+    ocultarCuadrosResueltos();
+    CONTADOR_INTENTOS++;
+
+    if (document.querySelectorAll('.cuadro-resuelto').length === 16) {
+        mostrarVictoria();
     }
 
-    turnos++;
+    actualizarIntentos();
+    resetearJugada();
+}
 
-    if (cuadrosSonIguales($primerCuadro, $cuadroActual)) {
-      eliminarCuadro($primerCuadro);
-      eliminarCuadro($cuadroActual);
-    } else {
-      ocultarCuadro($primerCuadro);
-      ocultarCuadro($cuadroActual);
+function errorJugada() {
+    ocultarImagenCuadro();
+    CONTADOR_INTENTOS++;
+    actualizarIntentos();
+    resetearJugada();
+}
+
+function manejarJugada() {
+    bloquearCuadroJugado();
+
+    if (verduraJugada.length === 2) {
+        bloquearTablero();
+
+        if (verduraJugada[0] === verduraJugada[1]) {
+            setTimeout(aciertoJugada, 400);
+        } else {
+            setTimeout(errorJugada, 400);
+        }
     }
-    $primerCuadro = null;
-  }
 }
 
-function cuadrosSonIguales($cuadro1, $cuadro2) {
-  return $cuadro1.className === $cuadro2.className;
+bloquearTablero();
 
-  /*
-  //Este patrón siempre se puede simplificar:
-  if($cuadro1.className === $cuadro2.className){
-    return true;
-  }else{
-    return false;
-  }
-  */
+document.querySelector('#boton-jugar').onclick = function() {
+    generarTableroRandom();
+    iniciarTiempoJuego();
+    desbloquearTablero();
+    deshabilitarBotonJugar();
 }
 
-function mostrarCuadro($cuadro) {
-  $cuadro.style.opacity = '1';
+document.querySelector('#boton-resetear').onclick = function() {
+    resetearTablero();
 }
-
-function ocultarCuadro($cuadro) {
-  setTimeout(function() {
-    $cuadro.style.opacity = '0';
-  }, 500);
-
-}
-
-function eliminarCuadro($cuadro) {
-  setTimeout(function() {
-    $cuadro.parentElement.classList.add('completo');
-    $cuadro.remove();
-    evaluarFinDeJuego();
-  }, 500);
-}
-
-function evaluarFinDeJuego() {
-  if (document.querySelectorAll('.cuadro').length === 0) {
-    $tablero.style.display = 'none';
-    $mensajeFinJuego.querySelector('strong').textContent = turnos.toString();
-    $mensajeFinJuego.style.display = 'block';
-  }
-}
-
-configurarJuego();
